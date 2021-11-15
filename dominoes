@@ -1,0 +1,233 @@
+from random import shuffle, randint
+
+#===================================================FUNCTIONS===========================================================
+
+# Create all dominoes pieces and shuffle it
+def create_deck():
+    dominoes = list()
+    for i in range(7):
+        for j in range(7):
+            if [j, i] in dominoes:
+                continue
+            dominoes.append([i, j])
+    shuffle(dominoes)
+    computer_hand = dominoes[:7]
+    player_hand = dominoes[7:14]
+    stock_hand = dominoes[14:]
+    return computer_hand, player_hand, stock_hand
+
+
+# Make the first turn and determinate the player
+def first_turn():
+    i = 1
+    global snake_list, ai_pieces, player_pieces, stock_pieces
+    global status
+    max_double = [0, 0]
+    counter = 0
+    for i in range(7):
+        if [i, i] in stock_pieces:
+            counter += 1
+            if counter == 6:
+                ai_pieces, player_pieces, stock_pieces = create_deck()
+                first_turn()
+            else:
+                continue
+        elif max_double < [i, i]:
+            max_double = [i, i]
+    snake_list.append(max_double)
+    if max_double in player_pieces:
+        player_pieces.pop(player_pieces.index(max_double))
+        status = ai_l
+    elif max_double in ai_pieces:
+        ai_pieces.pop(ai_pieces.index(max_double))
+        status = player_l
+    else:
+        create_deck()
+        first_turn()
+
+
+# Print game desk and win function call
+def print_table(status):
+    header = '=' * 70
+    stock_len = len(stock_pieces)
+    ai_len = len(ai_pieces)
+    ai_turn = "Status: Computer is about to make a move. Press Enter to continue..."
+    player_turn = "Status: It's your turn to make a move. Enter your command."
+    print(f"{header}\nStock size: {stock_len}\nComputer size: {ai_len}\n")
+    if len(snake_list) <= 6:
+        print(''.join(map(str, snake_list)))
+    else:
+        first_3 = ''.join(map(str, snake_list[:3]))
+        divider = "..."
+        last_3 = ''.join(map(str, snake_list[-3:]))
+        print(f"{first_3}{divider}{last_3}")
+    print("\nYour pieces: ")
+    if not win_check():
+        for i in range(len(player_pieces)):
+            print(f"{i+1}: {player_pieces[i]}")
+        print(f"\n{player_turn if status == player_l else ai_turn}")
+
+
+# Checking the input
+def is_valid():
+        while True:
+            try:
+                number = int(input())
+                if len(player_pieces) >= number >= -len(player_pieces):
+                    return int(number)
+                else:
+                    raise
+            except:
+                print("Invalid input. Please try again.")
+
+
+# Checing the validation and reversing pieces
+def need_turn(player_element, command):
+    first_snake_number = snake_list[0][0]
+    last_snake_number = snake_list[len(snake_list) - 1][1]
+    if command > 0:
+        if player_element[0] == last_snake_number:
+            return False
+        elif player_element[1] == last_snake_number:
+            return True
+    if command < 0:
+        if player_element[1] == first_snake_number:
+            return False
+        elif player_element[0] == first_snake_number:
+            return True
+
+# Making player or AI turn
+def make_turn():
+    global status, snake_list
+    if status == player_l:
+        status = ai_l
+        while True:
+            command = is_valid()
+            abs_command = abs(command)-1
+            temp = player_pieces.pop(abs_command) if command != 0 else None
+            if command == 0:
+                if len(stock_pieces) != 0:
+                    player_pieces.append(stock_pieces.pop())
+                    break
+                else:
+                    break
+            elif piece_check(temp, command):
+                if command > 0:
+                    if not need_turn(temp, command):
+                        snake_list.append(temp)
+                        break
+                    else:
+                        temp.reverse()
+                        snake_list.append(temp)
+                        break
+                elif command < 0:
+                    if not need_turn(temp, command):
+                        snake_list.insert(0, temp)
+                        break
+                    else:
+                        temp.reverse()
+                        snake_list.insert(0, temp)
+                        break
+            else:
+                player_pieces.insert(abs_command, temp)
+                print("Illegal move. Please try again.")
+                continue
+    else:
+        if input() == '':
+            status = player_l
+
+            while True:
+                ai_choice = len(ai_pieces)
+                ai_command = randint(-ai_choice, ai_choice)
+                abs_ai_command = abs(ai_command) - 1
+                temp = ai_pieces.pop(abs_ai_command) if ai_command != 0 else None
+                if ai_command == 0:
+                    if len(stock_pieces) != 0:
+                        ai_pieces.append(stock_pieces.pop())
+                        break
+                    else:
+                        break
+                elif piece_check(temp, ai_command):
+                    if ai_command > 0:
+                        if not need_turn(temp, ai_command):
+                            snake_list.append(temp)
+                            break
+                        else:
+                            temp.reverse()
+                            snake_list.append(temp)
+                            break
+                    elif ai_command < 0:
+                        if not need_turn(temp, ai_command):
+                            snake_list.insert(0, temp)
+                            break
+                        else:
+                            temp.reverse()
+                            snake_list.insert(0, temp)
+                            break
+                else:
+                    ai_pieces.insert(abs_ai_command, temp)
+                    continue
+        else:
+            make_turn()
+
+
+# Win checking
+def win_check():
+    global win_message
+    draw_message = "Status: The game is over. It's a draw!"
+    ai_win = "Status: The game is over. The computer won!"
+    player_win = "Status: The game is over. You won!"
+    if len(snake_list) > 1 and snake_list[0][0] == snake_list[len(snake_list)-1][1]:
+        counter = 0
+        for i in snake_list:
+            for j in i:
+                if j == snake_list[0][0] and snake_list[len(snake_list) - 1][1]:
+                    counter += 1
+        if counter == 8:
+            win_message = draw_message
+            return True
+    elif len(player_pieces) == 0:
+        win_message = player_win
+        return True
+    elif len(ai_pieces) == 0:
+        win_message = ai_win
+        return True
+    else:
+        return False
+
+
+# Check accessability of piece
+def piece_check(current_piece, command):
+    first_snake_number = snake_list[0][0]
+    last_snake_number = snake_list[len(snake_list) - 1][1]
+    if command > 0:
+        if current_piece[0] == last_snake_number or current_piece[1] == last_snake_number:
+            return True
+    elif command < 0:
+        if current_piece[1] == first_snake_number or current_piece[0] == first_snake_number:
+            return True
+    else:
+        return False
+
+
+#===================================================VARIABLES===========================================================
+
+ai_pieces, player_pieces, stock_pieces = create_deck()
+snake_list = list()
+status = ''
+ai_l = 'computer'
+player_l = 'player'
+win = False
+win_message = ''
+
+#=====================================================GAME==============================================================
+
+first_turn()
+
+while not win:
+    print_table(status)
+    if win_check():
+        print(f"\n{win_message}")
+        break
+    else:
+        make_turn()
