@@ -1,0 +1,60 @@
+from random import choice
+# Write your code here
+header = '=' * 70
+print(header + '\nH A N G M A N\n' + header)
+
+
+words = ('python', 'java', 'kotlin', 'javascript', 'hello', 'internship', 'doctor', 'membership', 'database', 'rabbit',
+         'rubbish', 'clothes', 'parrot', 'recruit', 'hebrew', 'commonwealth', 'mushroom', 'firefight', 'slumber', 'sin',
+         'expression', 'corona', 'pet', 'set', 'pepper', 'abracadabra', 'hurricane', 'stack', 'depression', 'meat',
+         'steel', 'bismark', 'newspaper', 'gazebo', 'pizza', 'coronavirus', 'terrifying', 'hollow', 'sunlight')
+
+
+while True:
+    start = input('Type "play" to play the game, "exit" to quit: ')
+    if start == 'exit':
+        break
+    elif start == 'play':
+        current = choice(words)
+        hidden = '-' * len(current)
+        hidden_list = list(hidden)
+        used_chars = set()
+        win = False
+        tries = 8
+        while tries != 0:
+            print()
+            print(hidden)
+
+            if current == hidden:
+                win = True
+                break
+
+            user_input = input(f'Input a letter: ')
+            if len(user_input) != 1:
+                print("You should input a single letter")
+                continue
+            elif not user_input.isalpha() or not user_input.islower():
+                print('Please enter a lowercase English letter')
+                continue
+
+            if user_input not in current and user_input not in used_chars:
+                print("That letter doesn't appear in the word")
+                tries -= 1
+                used_chars.add(user_input)
+            elif user_input in hidden or user_input in used_chars:
+                print("You've already guessed this letter")
+            else:
+                for index in range(len(current)):
+                    if user_input == current[index]:
+                        hidden_list[index] = current[index]
+                        hidden = ''.join(ch for ch in hidden_list)
+
+        if win:
+            print("\nYou guessed the word!")
+            print(f"You survived!\n{header}\n")
+            continue
+        else:
+            print(f"\nYou lost!\nThe word was: '{current}'.\n{header}\n")
+            continue
+    else:
+        continue
