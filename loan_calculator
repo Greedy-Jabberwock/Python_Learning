@@ -1,0 +1,121 @@
+from math import log, ceil, floor
+import argparse
+
+
+# ==============================================FUNCTIONS============================================================
+
+
+def valid_input():
+    type_list = ['diff', 'annuity']
+    args_list = [payment, principal, periods, interest_]
+    none_counter = 0
+    negative_counter = 0
+
+    for i in args_list:
+        if i is None:
+            none_counter += 1
+        elif i < 0:
+            negative_counter += 1
+    if type_ is None:
+        none_counter += 1
+
+    if none_counter > 1:
+        return False
+
+    if negative_counter > 0:
+        return False
+
+    if type_ not in type_list or interest_ is None:
+        return False
+
+    if type_ == 'diff' and payment is not None:
+        return False
+
+    return True
+
+
+def periods_count():
+    loan = principal
+    monthly_pay = args.payment
+    interest = interest_ / (12 * 100)
+    number_months = log((monthly_pay / (monthly_pay - interest * loan)), 1 + interest)
+    months = ceil(number_months)
+    overpayment = round(monthly_pay * months - loan)
+    years = int(months // 12)
+    months = months - years * 12
+    year_ = f'{years} years' if years > 1 else f'{years} year'
+    months_ = f'{months} months' if months > 1 else f'{months} month'
+    years_and_months = f"{year_} and {months_}" if years and months else f"{year_}" if not months else f"{months_}"
+    print(f"It will take {years_and_months} to repay this loan!")
+    print(f"Overpayment = {overpayment}")
+
+
+def monthly_payment():
+    loan = principal
+    months = periods
+    interest = interest_ / (12 * 100)
+    payment_ = ceil(loan * ((interest * pow((1 + interest), months)) / (pow((1 + interest), months) - 1)))
+    overpayment = round(payment_ * months - loan)
+    print(f"Your annuity payment = {ceil(payment_)}!\nOverpayment = {overpayment}")
+
+
+def loan_principal():
+    annuity = payment
+    periods_ = args.periods
+    interest = interest_ / (12 * 100)
+    temp = pow(1 + interest, periods_)
+    loan = annuity / ((interest * temp) / (temp - 1))
+    overpayment = ceil(annuity * periods_ - loan)
+    print(f"Your loan principal = {floor(loan)}!\nOverpayment = {overpayment}")
+
+
+def differentiated_payments():
+    p = principal
+    i = interest_ / (12 * 100)
+    n = periods
+    all_d = 0
+    for m in range(periods):
+        d = ceil(p / n + i * (p - (p * ((m + 1)- 1)) / n))
+        all_d += d
+        print(f"Month {m + 1}: payment is {d}")
+    overpayment = round(all_d - p)
+    print(f"\nOverpayment = {overpayment}")
+
+
+def main():
+    if valid_input():
+        if type_ == 'annuity':
+            if periods is None:
+                periods_count()
+            if payment is None:
+                monthly_payment()
+            if principal is None:
+                loan_principal()
+        elif type_ == 'diff':
+            differentiated_payments()
+    else:
+        print('Incorrect parameters.')
+
+# ==============================================VARIABLES============================================================
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--type', type=str)
+parser.add_argument('-pa', '--payment', type=float)
+parser.add_argument('-pr', '--principal', type=float)
+parser.add_argument('-pe', '--periods', type=int)
+parser.add_argument('-i', '--interest', type=float)
+args = parser.parse_args()
+
+
+type_ = args.type
+payment = args.payment
+principal = args.principal
+periods = args.periods
+interest_ = args.interest
+
+
+# ==============================================BODY============================================================
+main()
+
+
