@@ -1,0 +1,105 @@
+class CoffeeMachine:
+    def __init__(self):
+        self.ingredients_dict = {"water": 400, 'milk': 540, 'coffee beans': 120, 'cups': 9, "dollars": 550}
+
+    def read_input(self):
+        command = input()
+        return command
+
+    def print_ingredients(self):
+        water = self.ingredients_dict['water']
+        milk = self.ingredients_dict['milk']
+        beans = self.ingredients_dict['coffee beans']
+        cups = self.ingredients_dict['cups']
+        dollars = self.ingredients_dict['dollars']
+        print('\nThe coffee machine has:')
+        print(f'{water} of water')
+        print(f'{milk} of milk')
+        print(f'{beans} if coffee beans')
+        print(f'{cups} of disposable cups')
+        print(f'{dollars} of money')
+
+    def is_available(self, water, milk, beans, cups, dollars):
+        counter = 0
+        ingredient_list = [water, milk, beans, cups, dollars]
+        for key in self.ingredients_dict:
+            if self.ingredients_dict[key] - ingredient_list[counter] <= 0:
+                print(f'Sorry, not enough {key}!')
+                return False
+            else:
+                counter += 1
+        return True
+
+    def make_coffee(self, coffee_type):
+        if coffee_type == "1":
+            if self.is_available(250, 0, 16, 1, 0):
+                self.ingredients_dict['water'] -= 250
+                self.ingredients_dict['coffee beans'] -= 16
+                self.ingredients_dict['dollars'] += 4
+                self.ingredients_dict['cups'] -= 1
+            else:
+                return None
+        if coffee_type == "2":
+            if self.is_available(350, 75, 20, 1, 0):
+                self.ingredients_dict['water'] -= 350
+                self.ingredients_dict['milk'] -= 75
+                self.ingredients_dict['coffee beans'] -= 20
+                self.ingredients_dict['dollars'] += 7
+                self.ingredients_dict['cups'] -= 1
+            else:
+                return None
+        if coffee_type == "3":
+            if self.is_available(200, 100, 12, 1, 0):
+                self.ingredients_dict['water'] -= 200
+                self.ingredients_dict['milk'] -= 100
+                self.ingredients_dict['coffee beans'] -= 12
+                self.ingredients_dict['dollars'] += 6
+                self.ingredients_dict['cups'] -= 1
+            else:
+                return None
+
+        return self.ingredients_dict
+
+    def buy(self):
+        print('What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:')
+        command = self.read_input()
+        if command != 'back':
+            return self.make_coffee(command)
+        else:
+            return None
+
+    def fill(self):
+        print('Write how many ml of water you want to add:')
+        self.ingredients_dict['water'] += int(self.read_input())
+        print('Write how many ml of milk you want to add:')
+        self.ingredients_dict['milk'] += int(self.read_input())
+        print('Write how many grams of coffee beans you want to add:')
+        self.ingredients_dict['coffee beans'] += int(self.read_input())
+        print('Write how many disposable coffee cups you want to add:')
+        self.ingredients_dict['cups'] += int(self.read_input())
+        return self.ingredients_dict
+
+    def take(self):
+        print(f"I gave you ${self.ingredients_dict['dollars']}\n")
+        self.ingredients_dict['dollars'] = 0
+        return self.ingredients_dict
+
+
+def main():
+    georg = CoffeeMachine()
+    while True:
+        print('\nWrite action (buy, fill, take, remaining, exit):')
+        command = georg.read_input()
+        if command == 'buy':
+            georg.buy()
+        elif command == 'fill':
+            georg.fill()
+        elif command == 'take':
+            georg.take()
+        elif command == 'remaining':
+            georg.print_ingredients()
+        elif command == 'exit':
+            break
+
+
+main()
