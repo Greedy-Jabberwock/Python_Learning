@@ -50,21 +50,22 @@ def advanced_game(raw_list, user_choice, score):
         return int(score)
 
 
-def get_rating(name):
+"""def get_rating(name):
     with open('rating.txt', 'r') as rate:
         for line in rate:
             if line.startswith(name):
                 temp = line.split()
                 return temp[1]
-    return 0
+    return 0"""
 
 
 def main():
     user_name = input("Enter your name: ")
-    print(f'Hello, {user_name}')
+    print(f'Hello, {user_name}.')
+    print('Print "Enter" to play regular rules, or input your own elements comma separated.')
     game_variant = input()
     print("Okay, let's start")
-    score = get_rating(user_name)
+    score = 0
     user_choice = input()
     while user_choice != '!exit':
         if user_choice != '!rating':
@@ -80,3 +81,4 @@ def main():
 
 
 main()
+
